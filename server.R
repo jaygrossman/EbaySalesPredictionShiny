@@ -5,21 +5,6 @@ library(FNN)
 
 
 shinyServer(function(input, output) {
-  #output$contents <- renderTable({
-    
-    # input$file1 will be NULL initially. After the user selects and uploads a 
-    # file, it will be a data frame with 'name', 'size', 'type', and 'datapath' 
-    # columns. The 'datapath' column will contain the local filenames where the 
-    # data can be found.
-
-   # inFile <- input$file1
-
-    #if (is.null(inFile))
-     # return(NULL)
-    
-    #csv <- read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote)
-	  #summary(lm(speed~dist,data=csv))
-#  })
   output$playerinfo <- renderTable({
        
     players.data <- read.csv(file='players.csv', sep=',', h=T)
@@ -159,20 +144,6 @@ shinyServer(function(input, output) {
     cl <- factor(trainKnn.data$PriceBuckets)
     predKnn<-knn(trainKnn.data, test.data, cl, k = 3, prob=TRUE)
     
-    #test.data[["PriceBucket"]] <- test.raw.data$PriceBuckets
-    #test.data[["PriceBucketPrediction"]] <- as.numeric(as.character(predKnn))
-    # RMSE of clustering
-    #sqrt(mean(test.data$PriceBucket-test.data$PriceBucketPrediction)^2)
-    
-    # percent of items within group
-    #nrow(subset(test.data, PriceBucket == PriceBucketPrediction))/nrow(test.data)
-    
-    # percent of items within one group
-    #nrow(subset(test.data, (PriceBucket == PriceBucketPrediction | PriceBucket+5 == PriceBucketPrediction | PriceBucket-5 == PriceBucketPrediction)))/nrow(test.data)
-    
-    # percent of items within two groups
-    #nrow(subset(test.data, (PriceBucket == PriceBucketPrediction | PriceBucket+5 == PriceBucketPrediction | PriceBucket-5 == PriceBucketPrediction| PriceBucket+10 == PriceBucketPrediction | PriceBucket-10 == PriceBucketPrediction)))/nrow(test.data)
-    
     PriceBucket <- as.numeric(as.character(predKnn))
     Confidence <- "High"
     
@@ -187,27 +158,6 @@ shinyServer(function(input, output) {
     }
     
     paste("Predicted Sale Price : $", toString(round(prediction,digits=2)), ", Predicted PriceBucket : $", toString(PriceBucket), "- $", toString(PriceBucket+5),", Confidence Level : ", Confidence)
-
-    #########################################################################
-    # Output Results
-    #########################################################################
-
-   # output.data <- data.frame(PredictedSalePrice = numeric(N),
-  #                            PredictedPriceBucket = numeric(N))
-    
-  #  output.data[1, ] <- c(as.numeric(as.character(prediction)), PriceBucket)
-    
-    
-    
-    
-    
-    
-    # add fields to test.data
-    #test.data[["Prediction"]] <- exp(predCart)
-    
-    
-    
-    
    
   })
   
