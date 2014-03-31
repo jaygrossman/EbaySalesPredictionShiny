@@ -5,9 +5,24 @@ library(FNN)
 
 
 shinyServer(function(input, output) {
+  #output$contents <- renderTable({
+    
+    # input$file1 will be NULL initially. After the user selects and uploads a 
+    # file, it will be a data frame with 'name', 'size', 'type', and 'datapath' 
+    # columns. The 'datapath' column will contain the local filenames where the 
+    # data can be found.
+
+   # inFile <- input$file1
+
+    #if (is.null(inFile))
+     # return(NULL)
+    
+    #csv <- read.csv(inFile$datapath, header=input$header, sep=input$sep, quote=input$quote)
+	  #summary(lm(speed~dist,data=csv))
+#  })
   output$playerinfo <- renderTable({
        
-    players.data <- read.csv(file='players.csv', sep=',', h=T)
+    players.data <- read.csv(file='data\\players.csv', sep=',', h=T)
     player.data<-subset(players.data, PlayerName == input$player & CategoryName == input$category)
     
     output.data <- player.data [c("PlayerName", "CategoryName", "AuctionCount", "AuctionSaleCount","AuctionAvgPrice","AuctionMedianPrice","MaxPrice","MinPrice")]
@@ -23,10 +38,10 @@ shinyServer(function(input, output) {
     ###########################################################
     ## load reference data
     ###########################################################    
-    players.data <- read.csv(file='players.csv', sep=',', h=T)
+    players.data <- read.csv(file='data\\players.csv', sep=',', h=T)
     player.data<-subset(players.data, PlayerName == input$player & CategoryName == input$category)
 
-    sellers.data <- read.csv(file='sellers.csv', sep=',', h=T)
+    sellers.data <- read.csv(file='data\\sellers.csv', sep=',', h=T)
     seller.data<-subset(sellers.data, SellerName == input$seller)
     
     ###########################################################
@@ -51,8 +66,8 @@ shinyServer(function(input, output) {
     ## load training data
     ###########################################################
     
-    train.raw.data  <- read.csv(file='C:\\Users\\jay\\Desktop\\DataScienceClass\\JayFinalProject\\code\\data\\TrainingSet.csv', sep=',', h=T)
-    train.data.success <- train.raw.data [c("QuantitySold","AuctionMedianPrice", "Price","PricePercent","StartingBidPercent","SellerClosePercent","StartingBid","AvgPrice","HitCount","AuctionAvgHitCount","ItemAuctionSellPercent","SellerSaleAvgPriceRatio","AuctionHitCountAvgRatio","BestOffer", "IsHOF","ItemListedCount","AuctionCount","AuctionSaleCount","SellerAuctionCount","SellerAuctionSaleCount")]
+    train.raw.data  <- read.csv(file='data\\LogisticTrainingSet.csv', sep=',', h=T)
+    train.data.success <- train.raw.data [c("QuantitySold","AuctionMedianPrice", "AuctionSaleCount","StartingBidPercent","SellerClosePercent","ItemAuctionSellPercent")]
     # standardize training data points between 1 and 100
     train.data.success$SellerClosePercent <-train.data.success$SellerClosePercent*100
     train.data.success$StartingBidPercent <-train.data.success$StartingBidPercent*100
@@ -68,7 +83,7 @@ shinyServer(function(input, output) {
     lm.pred<-predict(glm.out, test.data, type="response")
     
     # add fields to test.data
-    paste("The probability this item will result in a sale is ", toString(round(lm.pred[1]*100,digits=2)),"%")
+    paste("The probability this item will result in a sale is ", toString(round(lm.pred[1]*100,digits=2)),"%", sep='')
     
   })
   
@@ -78,10 +93,10 @@ shinyServer(function(input, output) {
     ###########################################################
     ## load reference data
     ###########################################################    
-    players.data <- read.csv(file='players.csv', sep=',', h=T)
+    players.data <- read.csv(file='data\\players.csv', sep=',', h=T)
     player.data<-subset(players.data, PlayerName == input$player & CategoryName == input$category)
     
-    sellers.data <- read.csv(file='sellers.csv', sep=',', h=T)
+    sellers.data <- read.csv(file='data\\sellers.csv', sep=',', h=T)
     seller.data<-subset(sellers.data, SellerName == input$seller)
     
     ###########################################################
@@ -118,7 +133,11 @@ shinyServer(function(input, output) {
     ## load training data
     ###########################################################
     
-    train.raw.data  <- read.csv(file='C:\\Users\\jay\\Desktop\\DataScienceClass\\JayFinalProject\\code\\data\\TrainingSubset.csv', sep=',', h=T)
+    #train.raw.data  <- read.csv(file='C:\\Users\\jay\\Desktop\\DataScienceClass\\JayFinalProject\\code\\data\\TrainingSubset.csv', sep=',', h=T)
+    data.file.name <- paste('data\\price\\',input$category,'.csv',sep="") 
+    train.raw.data  <- read.csv(file=data.file.name, sep=',', h=T)
+    
+    
     # optimized set of features
     train.data <- train.raw.data[c("AuctionMedianPrice", "Price", "AvgPrice", "ItemAuctionSellPercent", "StartingBidPercent", "StartingBid", "Authenticated", "SellerSaleAvgPriceRatio", "IsHOF", "AuctionCount", "SellerAuctionSaleCount")]
     train.data$Price=log(train.data$Price)
@@ -157,8 +176,8 @@ shinyServer(function(input, output) {
       Confidence <- "Low"      
     }
     
-    paste("Predicted Sale Price : $", toString(round(prediction,digits=2)), ", Predicted PriceBucket : $", toString(PriceBucket), "- $", toString(PriceBucket+5),", Confidence Level : ", Confidence)
-   
+    paste("Predicted Sale Price : $", toString(round(prediction,digits=2)), ", Predicted PriceBucket : $", toString(PriceBucket), "-$", toString(PriceBucket+5), sep='')
+
   })
   
 })
